@@ -47,7 +47,7 @@ export async function run (): Promise<any> {
 }
 
 async function report (command: any): Promise<void> {
-  const { vueFiles, languageFiles, output } = command;
+  const { vueFiles, languageFiles } = command;
 
   const resolvedVueFiles: string = path.resolve(process.cwd(), vueFiles);
   const resolvedLanguageFiles: string = path.resolve(process.cwd(), languageFiles);
@@ -55,11 +55,7 @@ async function report (command: any): Promise<void> {
   const i18nReport: I18NReport = api.createI18NReport(resolvedVueFiles, resolvedLanguageFiles);
   api.logI18NReport(i18nReport);
 
-  if (output) {
-    await api.writeReportToFile(i18nReport, path.resolve(process.cwd(), output));
-    // tslint:disable-next-line
-    console.log(`The report has been has been saved to ${output}`);
-  }
+  await api.writeReportToFile(i18nReport, resolvedLanguageFiles, path.resolve(process.cwd()));
 }
 
 export default api;

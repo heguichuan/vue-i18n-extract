@@ -5,6 +5,7 @@
     <h3>{{ $t('header.titles.title_c') }}</h3>
     <p>{{ $t(`header.paragraphs.p_a`) }}</p>
     <p>{{ $t('header.paragraphs.p_b') }}</p>
+    <p>{{ $t('header.titles.tes4.t') }}</p>
   </div>
 </template>
 

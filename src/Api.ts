@@ -75,20 +75,50 @@ export default class VueI18NExtract {
     })
   }
 
-  public async writeReportToFile (report: I18NReport, writePath: string): Promise<NodeJS.ErrnoException | void> {
-    const reportString = JSON.stringify(report);
-    return new Promise((resolve, reject) => {
-      fs.writeFile(
-        writePath,
-        reportString,
-        (err) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve();
-        },
-      );
-    });
+  private removeUnusedKeys (unused: I18NItem[], parseLanguageFiles: I18NLanguage): I18NLanguage {
+    unused.forEach(item => {
+      parseLanguageFiles[item.language] = parseLanguageFiles[item.language].filter(i18nItem => {
+        return i18nItem.path !== item.path;
+      })
+    })
+
+    return parseLanguageFiles;
+  }
+
+  private addMissingKeys(missingKeys: I18NItem[], parseLanguageFiles: I18NLanguage): I18NLanguage {
+    missingKeys.forEach(item => {
+      let example = parseLanguageFiles[item.language][0]
+      parseLanguageFiles[item.language].push({
+        line: 0,
+        path: item.path,
+        file: example.file
+      })
+    })
+    return parseLanguageFiles;
+  }
+
+  public async writeReportToFile (report: I18NReport, languageFiles: string, writePath: string): Promise<NodeJS.ErrnoException | void> {
+    let parsedLanguageFiles: I18NLanguage = this.parseLanguageFiles(languageFiles);
+
+    parsedLanguageFiles = this.addMissingKeys(report.missingKeys, parsedLanguageFiles)
+    parsedLanguageFiles = this.removeUnusedKeys(report.unusedKeys, parsedLanguageFiles)
+
+    console.log(parsedLanguageFiles);
+
+
+    // const reportString = JSON.stringify(report);
+    // return new Promise((resolve, reject) => {
+    //   fs.writeFile(
+    //     writePath,
+    //     reportString,
+    //     (err) => {
+    //       if (err) {
+    //         reject(err);
+    //         return;
+    //       }
+    //       resolve();
+    //     },
+    //   );
+    // });
   }
 }
