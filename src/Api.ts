@@ -91,7 +91,8 @@ export default class VueI18NExtract {
       parseLanguageFiles[item.language].push({
         line: 0,
         path: item.path,
-        file: example.file
+        file: example.file,
+        value: ''
       })
     })
     return parseLanguageFiles;
@@ -103,8 +104,19 @@ export default class VueI18NExtract {
     parsedLanguageFiles = this.addMissingKeys(report.missingKeys, parsedLanguageFiles)
     parsedLanguageFiles = this.removeUnusedKeys(report.unusedKeys, parsedLanguageFiles)
 
-    console.log(parsedLanguageFiles);
+    // console.log("-------------------> \n", parsedLanguageFiles);
+    Object.values(parsedLanguageFiles).forEach(item => {
+      if (item instanceof Array && item.length > 0) {
+        let outputPath = item[0].file;
+        let outputJson = {};
+        item.forEach(i18nItem => {
+          outputJson[i18nItem.path] = i18nItem.value;
+        })
+        console.log(outputPath);
 
+        this.writeJsonToFile(outputPath, outputJson)
+      }
+    })
 
     // const reportString = JSON.stringify(report);
     // return new Promise((resolve, reject) => {
@@ -120,5 +132,22 @@ export default class VueI18NExtract {
     //     },
     //   );
     // });
+  }
+
+  private async writeJsonToFile(path: string, srcJson): Promise<NodeJS.ErrnoException | void> {
+    let outputStr = JSON.stringify(srcJson, null, 2);
+    if ( /\.js$/.test(path) ) {
+      outputStr = 'export default ' + outputStr;
+    }
+
+    return new Promise((resolve, reject) => {
+      fs.writeFile(path, outputStr, err => {
+        if (err) {
+          reject(err)
+          return;
+        }
+        resolve();
+      })
+    })
   }
 }

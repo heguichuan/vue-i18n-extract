@@ -6,11 +6,13 @@ export function extractI18nItemsFromLanguageFiles (languageFiles: SimpleFile[]):
     const language = file.fileName.substring(file.fileName.lastIndexOf('/') + 1, file.fileName.lastIndexOf('.'));
 
     const flattenedObject = dot.dot(file.content);
+
     const i18nInFile = Object.keys(flattenedObject).map((key, index) => {
       return {
         line: index,
         path: key,
         file: file.fileName,
+        value: flattenedObject[key]
       };
     });
 
